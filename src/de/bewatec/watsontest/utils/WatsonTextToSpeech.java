@@ -17,7 +17,7 @@ import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
 public class WatsonTextToSpeech {
 
 	private TextToSpeech service = null;
-	private Voice voice = Voice.EN_ALLISON;
+	private Voice voice = Voice.EN_MICHAEL;
 	private AudioFormat audioFormat = AudioFormat.WEBM_VORBIS;
 
 	private TextToSpeechListener listener = null;
@@ -54,7 +54,7 @@ public class WatsonTextToSpeech {
 				String fileName = Environment.getExternalStorageDirectory().getAbsolutePath();
 				fileName += "/testFile.webm";
 
-				// Carefull with supported Audioformats
+				// Carefull with supported Audioformats!
 				InputStream in = service.synthesize(params, voice, audioFormat).execute();
 
 				try {

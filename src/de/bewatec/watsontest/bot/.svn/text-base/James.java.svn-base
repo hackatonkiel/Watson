@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.Context;
 import android.database.CursorJoiner.Result;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -26,6 +28,9 @@ import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechTimestamp;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.Transcript;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.websocket.RecognizeCallback;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech;
+import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
+import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
+import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneOptions;
 
 import config.WatsonConfigData;
 import de.bewatec.watsontest.AudioStreamer;
@@ -47,6 +52,8 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 	private WatsonTextToSpeech textToSpeech;
 	private SpeechToText sttService;
 
+	private ToneAnalyzer toneAnalyzerService;
+
 	private boolean initialized = false;
 
 	private MediaPlayer mPlayer;
@@ -60,9 +67,13 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 	private Map<Integer, StringBuilder> speakerToWord;
 	private List<SpeechTimestamp> allTimestamps = null;
 	private int[] labelValues = null;
-	
 
-	public James() {
+	private AudioManager audioManager;
+	
+	private Context context;
+	
+	public James(Context app) {
+		this.context = app;
 		this.bufferSize = AudioRecord.getMinBufferSize(WatsonConfigData.sampleRate, WatsonConfigData.channelConfig,
 				WatsonConfigData.audioFormat) * 2;
 		Log.d(LOG_TAG, "BufferSize " + bufferSize);
@@ -103,18 +114,27 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 
 		textToSpeech = new WatsonTextToSpeech(textToSpeechService, this);
 
+		this.toneAnalyzerService = new ToneAnalyzer(ToneAnalyzer.VERSION_DATE_2016_05_19);
+		this.toneAnalyzerService.setUsernameAndPassword("b2581d44-9650-4d62-8e62-2ac17e3a377b", "YgEZXR404fsH");
+		this.toneAnalyzerService.setEndPoint("https://gateway-fra.watsonplatform.net/tone-analyzer/api");
+
+		this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		this.audioManager.setMicrophoneMute(true);
+		
 		
 		this.speakerLabels = new ArrayList<SpeakerLabel>();
-		this.speakerToWord = new HashMap<Integer,StringBuilder>();
+		this.speakerToWord = new HashMap<Integer, StringBuilder>();
 		this.allTimestamps = new ArrayList<SpeechTimestamp>();
 		this.labelValues = new int[10]; // max 10 Labels
-		
+
 		initialized = true;
 	}
 
 	public void startConversation() {
 		this.currentState = JamesStates.LISTENING;
 		// conversation.execute("");
+		Log.d(LOG_TAG,"now Listening");
+		this.audioManager.setMicrophoneMute(false);
 		speechToText.startSpeechToText(James.this, micStreamer);
 	}
 
@@ -148,7 +168,7 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 		// TODO Auto-generated method stub
 	}
 
-	private synchronized void extractItems(SpeechResults speech) {
+	private String extractItems(SpeechResults speech) {
 		Transcript finalResult = null;
 		SpeechAlternative alternativeWithMaxConf;
 		List<SpeechTimestamp> timeStamps;
@@ -165,24 +185,31 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 				if (finalResult != null) {
 
 					alternativeWithMaxConf = JamesUtils.getAlternativesWithMaxConfidence(finalResult);
-					Log.d(LOG_TAG, "Final transcript: " + alternativeWithMaxConf.getTranscript());
-					printAllSpeakers();
-					if (alternativeWithMaxConf != null) {
-						timeStamps = alternativeWithMaxConf.getTimestamps();
-						saveTimestamps(timeStamps);
-						sortWordToLabelByTimeStamp();
-						}
+
+					return alternativeWithMaxConf.getTranscript();
+
+					// Log.d(LOG_TAG, "Final transcript: " + alternativeWithMaxConf.getTranscript());
+
+					/*
+					 * printAllSpeakers(); if (alternativeWithMaxConf != null) { timeStamps =
+					 * alternativeWithMaxConf.getTimestamps(); saveTimestamps(timeStamps); sortWordToLabelByTimeStamp(); }
+					 */
 				}
 			}
 
-			addSpeakerLabels(speech.getSpeakerLabels());// If labels available they will be saved
+			// if(speech.getSpeakerLabels() != null){
+			// Log.d(LOG_TAG,"Labels?: "+speech.toString());
+			// }
+			// addSpeakerLabels(speech.getSpeakerLabels());// If labels available they will be saved
+
 		}
+		return null;
 	}
 
 	private synchronized void saveTimestamps(List<SpeechTimestamp> timestamps) {
 		if (timestamps != null) {
 			for (SpeechTimestamp speechTimestamp : timestamps) {
-				Log.d(LOG_TAG,"Timestamp: "+ speechTimestamp.getWord());
+				Log.d(LOG_TAG, "Timestamp: " + speechTimestamp.getWord());
 				this.allTimestamps.add(speechTimestamp);
 			}
 		}
@@ -194,33 +221,50 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 	 * @param speakerLabels
 	 */
 	private synchronized void addSpeakerLabels(List<SpeakerLabel> speakerLabelList) {
-		
+
 		if (speakerLabelList != null && this.speakerToWord != null && this.speakerLabels != null) {
+
 			for (SpeakerLabel speakerLabel : speakerLabelList) {
-				for(int counter = 0; counter < this.labelValues.length; counter ++){
-					if(this.labelValues[counter] == speakerLabel.getSpeaker()){
-						continue;
+				for (int counter = 0; counter < this.labelValues.length; counter++) {
+
+					if (!containsSpeakerLabel(speakerLabel.getSpeaker())) {
+						this.labelValues[counter] = speakerLabel.getSpeaker();
+						this.speakerToWord.put(speakerLabel.getSpeaker(), new StringBuilder(100));
+						this.speakerLabels.add(speakerLabel);
 					}
-					this.labelValues[counter] = speakerLabel.getSpeaker();
-					this.speakerToWord.put(speakerLabel.getSpeaker(), new StringBuilder(100));
-					this.speakerLabels.add(speakerLabel);
+
 				}
 			}
-			
+
 		}
 	}
 
-	private synchronized void sortWordToLabelByTimeStamp() {
+	private boolean containsSpeakerLabel(int speaker) {
 
+		for (int i = 0; i < this.labelValues.length; i++) {
+			if (this.labelValues[i] == speaker) {
+				return true;
+			}
+		}
+		return false;
+
+	}
+
+	private synchronized void sortWordToLabelByTimeStamp() {
+		Log.d(LOG_TAG, "sortWordToLabelByTimestamp");
 		if (this.allTimestamps != null) {
 
 			for (SpeechTimestamp timestamp : this.allTimestamps) {
+
 				if (timestamp != null && this.speakerToWord != null && this.speakerLabels != null) {
+
 					for (SpeakerLabel speaker : this.speakerLabels) {
+						Log.d(LOG_TAG, "try to add a word");
 						if (speaker.getFrom() == timestamp.getStartTime() && speaker.getTo() == timestamp.getEndTime()) {
-							
-							this.speakerToWord.get(speaker.getSpeaker()).append(timestamp.getWord());// append word to StringBuilder for the label
-							break;
+							StringBuilder builder = this.speakerToWord.get(speaker.getSpeaker());
+							builder.insert(builder.length(), timestamp.getWord());// append word to StringBuilder for the label
+
+							Log.d(LOG_TAG, "word should be added");
 						}
 					}
 				} else {
@@ -232,12 +276,12 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 	}
 
 	private synchronized void printAllSpeakers() {
-		
+
 		if (this.speakerLabels != null && this.speakerToWord != null) {
-			Log.d(LOG_TAG,speakerLabels.size()+ " Speakers are in list");
+			Log.d(LOG_TAG, speakerLabels.size() + " Speakers are in list");
 			for (SpeakerLabel label : this.speakerLabels) {
 				Log.d(LOG_TAG, "Speaker: " + label.getSpeaker() + " :"
-						+ this.speakerToWord.get(label.getSpeaker()).toString() );
+						+ this.speakerToWord.get(label.getSpeaker()).toString());
 			}
 		}
 	}
@@ -245,55 +289,37 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 	// get speech to text results
 	@Override
 	public void onTranscription(SpeechResults speech) {
-		// String resultString = speech.toString();
-		// Log.d(LOG_TAG, resultString);
+		 String resultString = extractItems(speech);
+		if(resultString != null)
+		 Log.d(LOG_TAG, "Speech: "+resultString);
+		
+		if (this.currentState == JamesStates.LISTENING) {
 
-		final SpeechResults finalSpeech = speech;
-		new Thread(new Runnable() {
+			final SpeechResults finalSpeech = speech;
+			new Thread(new Runnable() {
 
-			@Override
-			public void run() {
+				@Override
+				public void run() {
 
-				extractItems(finalSpeech);
+					String transcript = extractItems(finalSpeech);
 
-				if (speakerToWord != null) {
-					
+					if (transcript != null) {
+						// Call the service and get the tone
+						ToneOptions tonOptions = new ToneOptions.Builder().build();
+						ToneAnalysis tone = toneAnalyzerService.getTone(transcript, tonOptions).execute();
 
-					if (currentSpeaker != null) {
-
-						Log.d(LOG_TAG,
-								"CurrentSpeaker:" + " (" + currentSpeaker.getSpeaker() + ") "
-										+ speakerToWord.get(currentSpeaker).toString());
+						Log.d(LOG_TAG, "SpeechResult: " + transcript );
+						conversation.textToSpeech(transcript);
 					}
+					/*
+					 * if (speakerToWord != null) { if (currentSpeaker != null) { Log.d(LOG_TAG, "CurrentSpeaker:" + " (" +
+					 * currentSpeaker.getSpeaker() + ") " + speakerToWord.get(currentSpeaker).toString()); } }
+					 */
+
 				}
 
-			}
-
-		}).start();
-
-		/*
-		 * sortWordsToSpeakers(speech);
-		 * 
-		 * if (!hasCurrenSpeaker) { setCurrentSpeaker(); }
-		 * 
-		 * printAllSpeakers();
-		 * 
-		 * if (this.speakerToWord != null && this.currentSpeaker != null) {
-		 * 
-		 * Log.d(LOG_TAG, "CurrentSpeaker:"+" ("+this.currentSpeaker.getSpeaker() + ") " +
-		 * this.speakerToWord.get(this.currentSpeaker).toString());
-		 * 
-		 * }
-		 */
-		// String result = speech.getResults().get(0).getAlternatives().get(0).getTranscript();
-		// List<SpeakerLabel> labels = speech.getSpeakerLabels();
-		// speech.getResults().get(0).getKeywordsResult().get("James").get(0).getConfidence();
-
-		// speech.getResults().get(0).getAlternatives().get(0).getTimestamps().get(0);
-
-		// Log.d(LOG_TAG, result);
-
-		// conversation.textToSpeech(result);
+			}).start();
+		}
 
 	}
 
@@ -306,10 +332,12 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 	// Conversation results from watson
 	@Override
 	public void getConversationResult(String answer) {
-
+		this.audioManager.setMicrophoneMute(true);
+		this.currentState = JamesStates.TALKING;
+		Log.d(LOG_TAG,"now talking");
 		Log.d(LOG_TAG, "Conversation answ. :" + answer);
 
-		// textToSpeech.textToSpeech(answer);
+		textToSpeech.textToSpeech(answer);
 	}
 
 	// File where audio from texttospeech is saved
@@ -324,6 +352,16 @@ public class James implements TextToSpeechListener, ConversationListener, Recogn
 
 			@Override
 			public void onCompletion(MediaPlayer mp) {
+				
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				audioManager.setMicrophoneMute(false);
+				Log.d(LOG_TAG,"now Listening");
 				currentState = JamesStates.LISTENING;
 			}
 		});

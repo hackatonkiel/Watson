@@ -1,14 +1,14 @@
 10
 
 dir
-7922
+7923
 https://srv-subversion.bewatec.int/svn/ewp0160_meditec_2/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils
 https://srv-subversion.bewatec.int/svn/ewp0160_meditec_2
 
 
 
-2017-09-19T10:51:23.988865Z
-7917
+2017-09-20T14:03:21.220499Z
+7923
 daniel.kocian
 
 
@@ -134,10 +134,10 @@ file
 
 
 
-2017-09-20T14:02:29.643597Z
-4f5e94f5ce85baa080c3c08f0c8aeac6
-2017-09-19T10:51:23.988865Z
-7917
+2017-09-20T14:21:50.444416Z
+169c96b852c8a0e38f589a7d20dc85ad
+2017-09-20T14:03:21.220499Z
+7923
 daniel.kocian
 
 
@@ -160,7 +160,7 @@ daniel.kocian
 
 
 
-1449
+1447
 
 WatsonSpeechToText.java
 file
@@ -202,10 +202,10 @@ file
 
 
 
-2017-09-20T14:02:29.643597Z
-324415407f13c1deab18e65c43f577d0
-2017-09-19T10:51:23.988865Z
-7917
+2017-09-20T14:21:50.444416Z
+5966b32bb7d39ab3f13b5bb2afdc40a1
+2017-09-20T14:03:21.220499Z
+7923
 daniel.kocian
 
 
@@ -228,5 +228,5 @@ daniel.kocian
 
 
 
-1979
+1980
 

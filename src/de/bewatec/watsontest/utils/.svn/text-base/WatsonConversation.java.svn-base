@@ -26,15 +26,13 @@ public class WatsonConversation {
 	public void setListener(ConversationListener listener) {
 		this.listener = listener;
 	}
-	
-	
-	
-	
+
 	public void textToSpeech(final String params) {
-		
-		Log.d(LOG_TAG,"Message: "+ params);
+
+		Log.d(LOG_TAG, "Message: " + params);
 		new Thread(new Runnable() {
 			MessageRequest newMessage;
+
 			@Override
 			public void run() {
 				if (params == null) {
@@ -44,27 +42,15 @@ public class WatsonConversation {
 				}
 				MessageResponse response = service.message(WatsonConfigData.CONVERSATION_WORKSPACE_ID, newMessage)
 						.execute();
-				Log.d(LOG_TAG, response.getText().get(0));
-				
-				
-				listener.getConversationResult(response.getText().get(0));
-				
+				if (response.getText().size() > 0) {
+					Log.d(LOG_TAG, response.getText().get(0));
+
+					listener.getConversationResult(response.getText().get(0));
+				}
 			}
-		
-			
-			
+
 		}).start();
-		
-		
-		 
 
 	}
 
-
-
-	
-	
-	
-
-	
 }

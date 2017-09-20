@@ -36,7 +36,7 @@ public class MainActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		jamesBot = new James();
+		jamesBot = new James(this);
 		jamesBot.init();
 		
 		
