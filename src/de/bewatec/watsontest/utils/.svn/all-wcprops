@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 142
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils
+END
+ConversationListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils/ConversationListener.java
+END
+SpeechToTextListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils/SpeechToTextListener.java
+END
+TextToSpeechListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 168
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils/TextToSpeechListener.java
+END
+WatsonConversation.java
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils/WatsonConversation.java
+END
+WatsonSpeechToText.java
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils/WatsonSpeechToText.java
+END
+WatsonTextToSpeech.java
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/utils/WatsonTextToSpeech.java
+END

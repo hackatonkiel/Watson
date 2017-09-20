@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BewatecCamTest</string>
+    <string name="action_settings">Settings</string>
+    <string name="conversation_button">Conversation</string>
+ 	<string name="streaming_button">Play</string>
+
+</resources>

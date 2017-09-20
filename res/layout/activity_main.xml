@@ -1,0 +1,34 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.bewatec.watsontest.MainActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnCount="1" >
+
+        <Button
+            android:id="@+id/Streaming"
+            android:layout_width="133dp"
+            android:layout_height="85dp"
+            android:layout_column="0"
+            android:layout_gravity="left|top"
+            android:layout_row="0"
+            android:text="@string/streaming_button" />
+
+        <Button
+            android:id="@+id/Conversation"
+            android:layout_width="146dp"
+            android:layout_height="82dp"
+            android:layout_column="0"
+            android:layout_gravity="right|top"
+            android:layout_row="0"
+            android:text="@string/conversation_button" />
+
+    </GridLayout>
+
+</FrameLayout>

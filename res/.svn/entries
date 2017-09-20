@@ -1,0 +1,61 @@
+10
+
+dir
+7922
+https://srv-subversion.bewatec.int/svn/ewp0160_meditec_2/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/res
+https://srv-subversion.bewatec.int/svn/ewp0160_meditec_2
+
+
+
+2017-09-19T10:51:23.988865Z
+7917
+daniel.kocian
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+964f06c2-dd19-c34c-96ac-7144cecc4e45
+
+values
+dir
+
+values-w820dp
+dir
+
+drawable-hdpi
+dir
+
+drawable-xxhdpi
+dir
+
+menu
+dir
+
+values-v11
+dir
+
+drawable-ldpi
+dir
+
+values-v14
+dir
+
+drawable-mdpi
+dir
+
+drawable-xhdpi
+dir
+
+layout
+dir
+

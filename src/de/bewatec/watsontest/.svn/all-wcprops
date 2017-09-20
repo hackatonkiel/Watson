@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest
+END
+MainActivity.java
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/MainActivity.java
+END
+IBMConnector.java
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/IBMConnector.java
+END
+AudioStreamer.java
+K 25
+svn:wc:ra_dav:version-url
+V 155
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/AudioStreamer.java
+END
+CameraPreview.java
+K 25
+svn:wc:ra_dav:version-url
+V 155
+/svn/ewp0160_meditec_2/!svn/ver/7917/sw-android-v200/sdk/device/hisilicon/bigfish/packages/apps/BewatecCamTest/src/de/bewatec/watsontest/CameraPreview.java
+END
